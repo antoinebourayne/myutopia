@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="350dp"
+    android:layout_height="450dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="@color/beige"
+    tools:context=".LoginActivity">
+
+        <TextView
+            android:id="@+id/testPopUpLights"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_margin="30dp"
+            android:textSize="22sp"
+            android:text="@string/lights"/>
+
+        <SeekBar
+            android:id="@+id/jaugeLights"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:max="100"
+            android:progress="15"
+            android:indeterminate="false" />
+    </LinearLayout>
