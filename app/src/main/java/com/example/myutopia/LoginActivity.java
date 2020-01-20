@@ -58,19 +58,14 @@ public class LoginActivity extends AppCompatActivity {
 
     public void testValidUser(String m_user, String m_password)
     {
-        printBlock = new Block<Document>() {
-            @Override
-            public void apply(final Document document) {
-                System.out.println(document.toJson());
-                String string = document.toString();
-                boolean isFound = string.indexOf(m_password) !=-1? true: false;
-                Log.i(TAG, "Username corresponds to password : "+isFound);
-                if(isFound){
-                    MainActivity.loggedIn = 1;
-                    createUser(m_user);
-                    MainActivity.mHandler.sendEmptyMessage(MainActivity.POT_ACTIVITY);
-                    finish();
-                }
+        printBlock = document -> {
+            String string = document.toString();
+            boolean isFound = string.indexOf(m_password) !=-1? true: false;
+            if(isFound){
+                MainActivity.loggedIn = 1;
+                createUser(m_user);
+                MainActivity.mHandler.sendEmptyMessage(MainActivity.POT_ACTIVITY);
+                finish();
             }
         };
 
@@ -80,6 +75,15 @@ public class LoginActivity extends AppCompatActivity {
     public void createUser(String m_user)
     {
         MainActivity.User.setUserName(m_user);
+    }
+
+    //Override methods
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MainActivity.mHandler.sendEmptyMessage(MainActivity.POT_ACTIVITY);
+        finish();
     }
 
 }
