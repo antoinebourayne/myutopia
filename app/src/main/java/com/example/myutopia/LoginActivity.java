@@ -59,11 +59,12 @@ public class LoginActivity extends AppCompatActivity {
     public void testValidUser(String m_user, String m_password)
     {
         printBlock = document -> {
-            String string = document.toString();
-            boolean isFound = string.indexOf(m_password) !=-1? true: false;
+            String userInfos = document.toString();
+            boolean isFound = userInfos.indexOf(m_password) !=-1? true: false;
             if(isFound){
+                Log.i(TAG, "User Raw Informations : "+userInfos);
                 MainActivity.loggedIn = 1;
-                createUser(m_user);
+                initUsername(m_user);
                 MainActivity.mHandler.sendEmptyMessage(MainActivity.POT_ACTIVITY);
                 finish();
             }
@@ -72,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
         MainActivity.Collection.find(eq("username", m_user)).forEach(printBlock);
     }
 
-    public void createUser(String m_user)
+    public void initUsername(String m_user)
     {
         MainActivity.User.setUserName(m_user);
     }

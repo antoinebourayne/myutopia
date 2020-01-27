@@ -76,5 +76,14 @@ public class SignInActivity extends AppCompatActivity {
         });
     }
 
+    //Override methods
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MainActivity.mHandler.sendEmptyMessage(MainActivity.POT_ACTIVITY);
+        finish();
+    }
+
 
 }

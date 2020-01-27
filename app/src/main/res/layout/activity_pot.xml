@@ -1,27 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".PotActivity"
-    android:background="@drawable/fonddecran_myutopia">
+    android:id="@+id/potBackground"
+    android:scaleType="fitXY">
 
-    <TextView
-        android:id="@+id/userButton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/upperLayout"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="70dp">
+
+        <ImageView
+            android:id="@+id/userButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </ImageView>
+
+        <ImageView
+            android:id="@+id/viewTemperature"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="200dp">
+        </ImageView>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/window"
+        android:layout_below="@id/upperLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/login"
-        android:textSize="40sp"
-        android:backgroundTint="@color/white">
+        android:gravity="center">
 
-    </TextView>
+        <ImageView
+            android:id="@+id/upperLights"
+            android:layout_width="500dp"
+            android:layout_height="200dp">
+        </ImageView>
 
-    <ImageView
-        android:id="@+id/loupeLights"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="10dp"
-        android:layout_gravity="center">
+        <RelativeLayout
+            android:id="@+id/midContent"
+            android:layout_below="@id/upperLights"
+            android:layout_width="match_parent"
+            android:layout_height="150dp">
 
-    </ImageView>
-</LinearLayout>
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/downPot"
+            android:layout_below="@id/midContent"
+            android:layout_width="900dp"
+            android:layout_height="300dp">
+        </ImageView>
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>

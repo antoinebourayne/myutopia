@@ -3,11 +3,12 @@ package com.example.myutopia.classes;
 public class User {
 
     //Attributes
-    private String id;
-    private String firstName;
-    private String secondName;
-    private String userName;
-    private String password;
+    private String   id;
+    private String   firstName;
+    private String   secondName;
+    private String   userName;
+    private String   password;
+    private String[] stuff;
 
 
     //Constructors
@@ -35,7 +36,9 @@ public class User {
     public void setSecondName(String secondName) { this.secondName = secondName; }
     public void setUserName(String userName) { this.userName = userName; }
     public void setPassword(String password) { this.password = password; }
+    public void setStuff(String[] stuff) { this.stuff = stuff; }
 
 
     //Methods
+
 }

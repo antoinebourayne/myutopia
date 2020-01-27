@@ -8,6 +8,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import com.example.myutopia.MainActivity;
 
+import static androidx.constraintlayout.widget.Constraints.TAG;
+
 public class HandlerMainActivity extends Handler {
 
     //Constantes
@@ -25,7 +27,6 @@ public class HandlerMainActivity extends Handler {
 
     @Override
     public void handleMessage(@NonNull Message msg) {
-        Log.i("sexe", msg.arg1+" "+msg.arg1+" "+msg.what);
         switch (msg.what)
         {
             case MAIN_ACTIVITY:
