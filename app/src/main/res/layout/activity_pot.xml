@@ -15,15 +15,18 @@
 
         <ImageView
             android:id="@+id/userButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_width="50dp"
+            android:layout_height="50dp">
         </ImageView>
 
         <ImageView
-            android:id="@+id/viewTemperature"
-            android:layout_width="200dp"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="200dp">
+            android:id="@+id/weatherButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/icone_weather"
+            android:layout_gravity="right"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="260dp">
         </ImageView>
 
     </LinearLayout>
@@ -37,24 +40,48 @@
 
         <ImageView
             android:id="@+id/upperLights"
-            android:layout_width="500dp"
-            android:layout_height="200dp">
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="150dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/icone_light_bulb">
         </ImageView>
 
         <RelativeLayout
-            android:id="@+id/midContent"
-            android:layout_below="@id/upperLights"
+            android:id="@+id/bottomLayout"
             android:layout_width="match_parent"
-            android:layout_height="150dp">
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
 
+            <ImageView
+                android:id="@+id/downPot"
+                android:layout_width="400dp"
+                android:layout_height="250dp"
+                android:layout_marginBottom="50dp"
+                android:layout_alignParentBottom="true">
+            </ImageView>
+
+            <ImageView
+                android:id="@+id/mainPlant"
+                android:layout_width="260dp"
+                android:layout_height="250dp"
+                android:layout_above="@id/downPot"
+                android:layout_marginBottom="-158dp"
+                android:layout_centerHorizontal="true">
+            </ImageView>
+
+            <ImageView
+                android:id="@+id/viewTemperature"
+                android:layout_width="40dp"
+                android:layout_height="150dp"
+                android:layout_above="@id/downPot"
+                android:layout_marginBottom="-160dp"
+                android:layout_marginLeft="70dp"
+                android:layout_alignLeft="@+id/downPot">
+            </ImageView>
         </RelativeLayout>
 
-        <ImageView
-            android:id="@+id/downPot"
-            android:layout_below="@id/midContent"
-            android:layout_width="900dp"
-            android:layout_height="300dp">
-        </ImageView>
 
     </RelativeLayout>
 

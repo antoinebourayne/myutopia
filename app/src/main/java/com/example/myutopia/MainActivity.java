@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.androdocs.httprequest.HttpRequest;
 import com.bumptech.glide.Glide;
+import com.example.myutopia.classes.DayInfo;
 import com.example.myutopia.classes.User;
 import com.example.myutopia.handlers.HandlerMainActivity;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -26,18 +27,31 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
 
     //Constantes
-    public static final int MAIN_ACTIVITY    = 1;
-    public static final int LOGIN_ACTIVITY   = 2;
-    public static final int SIGN_IN_ACTIVITY = 3;
-    public static final int POT_ACTIVITY     = 4;
+    public static final int MAIN_ACTIVITY          = 1;
+    public static final int LOGIN_ACTIVITY         = 2;
+    public static final int SIGN_IN_ACTIVITY       = 3;
+    public static final int POT_ACTIVITY           = 4;
+
+    public static final int RAS                    = 0;
+    public static final int DANGER_GEL             = 1;
+    public static final int DANGER_CANICULE        = 2;
+    public static final int ALERTE_GEL             = 3;
+    public static final int ALERTE_CANICULE        = 4;
+
+    public static final int SEUIL_DANGER_GEL       = 2;
+    public static final int SEUIL_DANGER_CANICULE  = 35;
+    public static final int SEUIL_ALERTE_GEL       = 0;
+    public static final int SEUIL_ALERTE_CANICULE  = 39;
 
     public static final String CITY = "paris,fr";
     public static final String API = "7a92826f74b3e959996e9a46080c4aad";
@@ -52,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     public static StitchAppClient stitchAppClient;
     public static int loggedIn = 0; // 0 : not logged in  1 : logged in
     public static User User;
-    public static String TEMPERATURE;
+    public static List<DayInfo> weekInfo = new ArrayList<>();
 
 
     //Handlers
@@ -70,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
         dbLogin();
         choseActivity(LOGIN_ACTIVITY);
     }
+
+    //Methods
 
     public void dbLogin()
     {
@@ -114,6 +130,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public int weatherAnalysis()
+    {
+        List<DayInfo> localWeekInfo = weekInfo;
+
+        for (int i=0; i<localWeekInfo.size(); i++)
+        {
+            if(localWeekInfo.get(i).getMinTemp()<SEUIL_ALERTE_GEL) { return ALERTE_GEL; }
+            if(localWeekInfo.get(i).getMinTemp()<SEUIL_DANGER_GEL) {return DANGER_GEL; }
+            if(localWeekInfo.get(i).getMaxTemp()>SEUIL_ALERTE_CANICULE) {return ALERTE_CANICULE; }
+            if(localWeekInfo.get(i).getMaxTemp()>SEUIL_DANGER_CANICULE) {return DANGER_CANICULE; }
+        }
+
+        return RAS;
+    }
+
+    //Asynchrones
+
     class weatherTask extends AsyncTask<String, Void, String>{
 
         @Override
@@ -124,49 +157,26 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... strings) {
-            String response = HttpRequest.excuteGet("https://api.openweathermap.org/data/2.5/forecast?q=" + CITY + "&units=metric&cnt=5&appid=" + API);
+            String response = HttpRequest.excuteGet("https://api.openweathermap.org/data/2.5/forecast?q=" + CITY + "&units=metric&cnt=56&appid=" + API);
             return response;
         }
 
         @Override
         protected void onPostExecute(String result) {
 
-
             try {
                 JSONObject jsonObj = new JSONObject(result);
                 JSONArray jArray = jsonObj.getJSONArray("list");
-
-                for(int i=0; i < jArray.length(); i++)
+                for(int i=0; i < jArray.length(); i+=8)
                 {
-                    //jArray.getJSONObject(i).getString("dt");
-                    JSONObject main = jArray.getJSONObject(i).getJSONObject("main");
-                    String temperature = "Day "+i+" "+main.getString("temp");
-                    Log.i(TAG, temperature);
+                    JSONObject main     = jArray.getJSONObject(i).getJSONObject("main");
+                    String date         = jArray.getJSONObject(i).getString("dt_txt");
+                    float minTemp       = Float.parseFloat(main.getString("temp_min"));
+                    float maxTemp       = Float.parseFloat(main.getString("temp_max"));
+
+                    String dateNiceFormat = String.valueOf(date.charAt(5))+ date.charAt(6) +"/"+ date.charAt(8)+ date.charAt(9);
+                    weekInfo.add(new DayInfo(minTemp,maxTemp,dateNiceFormat));
                 }
-                /*
-                JSONObject main = jsonObj.getJSONObject("main");
-                JSONObject sys = jsonObj.getJSONObject("sys");
-                JSONObject wind = jsonObj.getJSONObject("wind");
-                JSONObject weather = jsonObj.getJSONArray("weather").getJSONObject(0);
-
-                Long updatedAt = jsonObj.getLong("dt");
-                String updatedAtText = "Updated at: " + new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.ENGLISH).format(new Date(updatedAt * 1000));
-                String temp = main.getString("temp") + "°C";
-                String tempMin = "Min Temp: " + main.getString("temp_min") + "°C";
-                String tempMax = "Max Temp: " + main.getString("temp_max") + "°C";
-                String pressure = main.getString("pressure");
-                String humidity = main.getString("humidity");
-
-                Long sunrise = sys.getLong("sunrise");
-                Long sunset = sys.getLong("sunset");
-                String windSpeed = wind.getString("speed");
-                String weatherDescription = weather.getString("description");
-
-                String address = jsonObj.getString("name") + ", " + sys.getString("country");
-
-                TEMPERATURE = temp;
-
-                 */
 
             } catch (JSONException e) {
                 Log.i(TAG, "onPostExecute Exception : "+e);

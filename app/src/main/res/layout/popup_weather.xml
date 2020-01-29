@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="450dp"
+    android:layout_height="600dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/beige"
+    tools:context=".LoginActivity">
+
+    <TextView
+        android:id="@+id/titlePopupWeather"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:textSize="30sp"
+        android:text="@string/weather_popup_title">
+    </TextView>
+
+    <ListView
+        android:id="@+id/popupWeatherListView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

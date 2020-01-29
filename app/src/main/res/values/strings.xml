@@ -8,4 +8,5 @@
     <string name="sign_in">Sign In</string>
     <string name="lights">Lights</string>
     <string name="login">Login</string>
+    <string name="weather_popup_title">Weather Forecast</string>
 </resources>

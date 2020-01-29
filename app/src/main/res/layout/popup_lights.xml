@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="350dp"
-    android:layout_height="450dp"
+    android:layout_width="wrap_content"
+    android:layout_height="600dp"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:background="@color/beige"
@@ -15,11 +15,9 @@
             android:textSize="22sp"
             android:text="@string/lights"/>
 
-        <SeekBar
-            android:id="@+id/jaugeLights"
+        <ImageView
+            android:id="@+id/lightBulb"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:max="100"
-            android:progress="15"
-            android:indeterminate="false" />
+            android:src="@drawable/icone_light_bulb_off"/>
     </LinearLayout>
