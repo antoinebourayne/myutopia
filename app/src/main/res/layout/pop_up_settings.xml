@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="450dp"
+    android:layout_height="600dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/beige"
+    tools:context=".LoginActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings">
+    </TextView>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/nameSetting1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/nightmode">
+        </TextView>
+
+        <ImageView
+            android:id="@+id/buttonSetting1"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@drawable/icone_settings">
+        </ImageView>
+
+    </LinearLayout>
+
+</LinearLayout>

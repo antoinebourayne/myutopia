@@ -4,11 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,7 +20,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.example.myutopia.classes.DayInfo;
 import com.example.myutopia.methods.GlideApp;
 
 import org.bson.Document;
@@ -32,7 +32,12 @@ public class PotActivity extends AppCompatActivity {
     private final static int LIGHTS_OFF = 0;
     private final static int LIGHTS_ON  = 1;
 
+    private final static int NM_OFF = 0;
+    private final static int NM_ON  = 1;
+
     private static int LIGHT_STATE;
+
+    private static int NM_STATE;
 
     private ImageView      mSignIn;
     private ImageView      mLights;
@@ -41,6 +46,11 @@ public class PotActivity extends AppCompatActivity {
     private ImageView      mViewTemperature;
     private ImageView      mPlantView;
     private ImageView      mWeather;
+    private TextView       mPlantTitle;
+    private TextView       mPlantInfo;
+    private ImageView      mFontain;
+    private ImageView      mTap;
+    private ImageView      mSettings;
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -53,6 +63,7 @@ public class PotActivity extends AppCompatActivity {
         setListeners();
         updateView();
         LIGHT_STATE = LIGHTS_OFF;
+        NM_STATE = NM_OFF;
     }
 
     public void setViews()
@@ -64,6 +75,11 @@ public class PotActivity extends AppCompatActivity {
         mViewTemperature    = (ImageView) findViewById(R.id.viewTemperature);
         mWeather            = (ImageView) findViewById(R.id.weatherButton);
         mPlantView          = (ImageView) findViewById(R.id.mainPlant);
+        mFontain            = (ImageView) findViewById(R.id.fontain);
+        mPlantInfo          = (TextView) findViewById(R.id.plantInfoTextView);
+        mPlantTitle         = (TextView) findViewById(R.id.plantInfoTitle);
+        mTap                = (ImageView) findViewById(R.id.waterTap);
+        mSettings           = (ImageView) findViewById(R.id.settingsButton);
     }
 
     public void setListeners()
@@ -81,6 +97,18 @@ public class PotActivity extends AppCompatActivity {
             public void onClick(View v) {
             }
         });
+
+        mSettings.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                openSettings(v);
+            }
+        });
+
+        mPlantView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            }
+        });
+
         mLights.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 toggleLight(v);
@@ -92,11 +120,24 @@ public class PotActivity extends AppCompatActivity {
                 openWeather(v);
             }
         });
+
+        mFontain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleWater(mTap);
+            }
+        });
     }
 
-    public void setLights(int m_color, int m_power)
+    public void toggleWater(ImageView v)
     {
-        Log.i(TAG, "Lights Power : "+m_power+"  Color : "+m_color);
+        ImageView img = (ImageView)findViewById(R.id.waterTap);
+        Animation outFade = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fade_out);
+        img.startAnimation(outFade);
+
+        Document filterDoc = new Document().append("username", "prototype");
+        Document updateDoc = new Document().append("$set", new Document().append("arrosage", 1));
+        MainActivity.Collection.updateOne(filterDoc, updateDoc);
     }
 
     public void openWeather(View v)
@@ -136,6 +177,57 @@ public class PotActivity extends AppCompatActivity {
         });
     }
 
+
+    public void openSettings(View v)
+    {
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        View popupView = inflater.inflate(R.layout.pop_up_settings, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+        popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
+
+        ImageView mLightToggle = (ImageView) findViewById(R.id.upperLights);
+
+        //TODO: FAIRE OPEN SETTINGS NIGHTMODE
+
+        mLightToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (LIGHT_STATE == LIGHTS_OFF){
+                    LIGHT_STATE = LIGHTS_ON;
+                    mLightToggle.setImageResource(R.drawable.nice_lightbulb_on);
+
+                    Document filterDoc = new Document().append("username", "prototype");
+                    Document updateDoc = new Document().append("$set", new Document().append("light", 1));
+                    MainActivity.Collection.updateOne(filterDoc, updateDoc);
+
+                }else{
+                    LIGHT_STATE = LIGHTS_OFF;
+                    mLightToggle.setImageResource(R.drawable.nice_lightbulb_off);
+
+                    Document filterDoc = new Document().append("username", "prototype");
+                    Document updateDoc = new Document().append("$set", new Document().append("light", 0));
+                    MainActivity.Collection.updateOne(filterDoc, updateDoc);
+                }
+            }
+        });
+
+
+        // dismiss the popup window when touched
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+    }
+
     public void toggleLight(View v)
     {
         ImageView mLightToggle = (ImageView) findViewById(R.id.upperLights);
@@ -145,18 +237,18 @@ public class PotActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (LIGHT_STATE == LIGHTS_OFF){
                     LIGHT_STATE = LIGHTS_ON;
-                    mLightToggle.setImageResource(R.drawable.icone_light_bulb);
+                    mLightToggle.setImageResource(R.drawable.nice_lightbulb_on);
 
                     Document filterDoc = new Document().append("username", "prototype");
-                    Document updateDoc = new Document().append("$set", new Document().append("light", "1"));
+                    Document updateDoc = new Document().append("$set", new Document().append("light", 1));
                     MainActivity.Collection.updateOne(filterDoc, updateDoc);
 
                 }else{
                     LIGHT_STATE = LIGHTS_OFF;
-                    mLightToggle.setImageResource(R.drawable.icone_light_bulb_off);
+                    mLightToggle.setImageResource(R.drawable.nice_lightbulb_off);
 
                     Document filterDoc = new Document().append("username", "prototype");
-                    Document updateDoc = new Document().append("$set", new Document().append("light", "0"));
+                    Document updateDoc = new Document().append("$set", new Document().append("light", 0));
                     MainActivity.Collection.updateOne(filterDoc, updateDoc);
                 }
             }
@@ -165,16 +257,18 @@ public class PotActivity extends AppCompatActivity {
 
     public void updateView()
     {
-        String urLogo        = "https://i.ibb.co/M21kQVL/Artboard-2.png";
-        String urlBackground = "https://i.ibb.co/vBx6LNq/window-background.png";
-        String urlPot        = "https://i.ibb.co/GvS1VKr/potombre.png";
-        String urlThermo     = "https://i.ibb.co/17mxT3g/thermometre-bois-publicitaire-personnalisable-0013713-jpg.png";
-        String urlPlant      = "https://i.ibb.co/F5tTPv2/plante-1-Copie.png";
+        String urLogo          = "https://i.ibb.co/M21kQVL/Artboard-2.png";
+        String urlBackground   = "https://i.ibb.co/vBx6LNq/window-background.png";
+        String urlPot          = "https://i.ibb.co/p472900/Pot-nu.png";
+        String urlThermo       = "https://i.ibb.co/17mxT3g/thermometre-bois-publicitaire-personnalisable-0013713-jpg.png";
+        String urlPlant        = "https://i.ibb.co/F5tTPv2/plante-1-Copie.png";
+        String urlrockyFontain = "https://i.ibb.co/CP2Y8Jm/nice-rocky-fountain.png";
 
         GlideApp.with(this).load(urLogo).override(150,150).into(mSignIn);
         GlideApp.with(this).load(urlPot).override(3000,1000).into(mDownPot);
         GlideApp.with(this).load(urlThermo).override(300,300).into(mViewTemperature);
         GlideApp.with(this).load(urlPlant).into(mPlantView);
+        GlideApp.with(this).load(urlrockyFontain).into(mFontain);
 
         GlideApp.with(this).load(urlBackground).into(new SimpleTarget<Drawable>() {
             @Override

@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         new weatherTask().execute();
         setContentView(R.layout.activity_pot);
         dbLogin();
-        choseActivity(LOGIN_ACTIVITY);
+        choseActivity(POT_ACTIVITY);
     }
 
     //Methods
