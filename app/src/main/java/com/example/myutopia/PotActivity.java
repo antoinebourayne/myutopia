@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -21,11 +22,19 @@ import android.widget.TextView;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.myutopia.methods.GlideApp;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.mongodb.Block;
+import com.mongodb.lang.NonNull;
+import com.mongodb.stitch.android.services.mongodb.remote.RemoteFindIterable;
+import com.mongodb.stitch.core.services.mongodb.remote.RemoteFindOptions;
 
 import org.bson.Document;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mongodb.client.model.Filters.eq;
 
 public class PotActivity extends AppCompatActivity {
 
@@ -43,7 +52,7 @@ public class PotActivity extends AppCompatActivity {
     private ImageView      mLights;
     private RelativeLayout mBackground;
     private ImageView      mDownPot;
-    private ImageView      mViewTemperature;
+    private ImageView      mDashboard;
     private ImageView      mPlantView;
     private ImageView      mWeather;
     private TextView       mPlantTitle;
@@ -53,6 +62,9 @@ public class PotActivity extends AppCompatActivity {
     private ImageView      mSettings;
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    private Block<Document> printBlock;
+
 
 
     @Override
@@ -72,7 +84,7 @@ public class PotActivity extends AppCompatActivity {
         mLights             = (ImageView)   findViewById(R.id.upperLights);
         mBackground         = (RelativeLayout)findViewById(R.id.potBackground);
         mDownPot            = (ImageView)findViewById(R.id.downPot);
-        mViewTemperature    = (ImageView) findViewById(R.id.viewTemperature);
+        mDashboard          = (ImageView) findViewById(R.id.viewTemperature);
         mWeather            = (ImageView) findViewById(R.id.weatherButton);
         mPlantView          = (ImageView) findViewById(R.id.mainPlant);
         mFontain            = (ImageView) findViewById(R.id.fontain);
@@ -93,8 +105,9 @@ public class PotActivity extends AppCompatActivity {
             }
         });
 
-        mViewTemperature.setOnClickListener(new View.OnClickListener() {
+        mDashboard.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                openDashboard(v);
             }
         });
 
@@ -138,6 +151,55 @@ public class PotActivity extends AppCompatActivity {
         Document filterDoc = new Document().append("username", "prototype");
         Document updateDoc = new Document().append("$set", new Document().append("arrosage", 1));
         MainActivity.Collection.updateOne(filterDoc, updateDoc);
+    }
+
+    public void openDashboard(View v)
+    {
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        View popupView = inflater.inflate(R.layout.popup_dashboard, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+        popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
+
+
+        TextView mSensorName1     = (TextView) popupView.findViewById(R.id.nameSensor1);
+        TextView mSensorName2     = (TextView) popupView.findViewById(R.id.nameSensor2);
+        TextView mSensorName3     = (TextView) popupView.findViewById(R.id.nameSensor3);
+
+        TextView mSensorValue1     = (TextView) popupView.findViewById(R.id.valueSensor1);
+        TextView mSensorValue2     = (TextView) popupView.findViewById(R.id.valueSensor2);
+        TextView mSensorValue3     = (TextView) popupView.findViewById(R.id.valueSensor3);
+
+        mSensorName1.setText("Temperature");
+        mSensorName2.setText("Moisture");
+        mSensorName3.setText("enlightenment");
+
+        printBlock = document -> { String sensorValue = document.toString();
+            Log.i(TAG, "CACA : "+sensorValue);
+            String a = document.toJson();}
+            ;
+
+        MainActivity.Collection.find(eq("username", "prototype")).forEach(printBlock);
+        MainActivity.Collection.find(eq("id_rpi", "prototype")).forEach(printBlock);
+
+
+        //TODO: juste en dessous choper les valeurs
+        String example = "/abc/def/ghfj.doc";
+        System.out.println(example.substring(example.lastIndexOf("/") + 1));
+
+        // dismiss the popup window when touched
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
     }
 
     public void openWeather(View v)
@@ -191,27 +253,25 @@ public class PotActivity extends AppCompatActivity {
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
         popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
 
-        ImageView mLightToggle = (ImageView) findViewById(R.id.upperLights);
+        ImageView mNMToggle = (ImageView) popupView.findViewById(R.id.buttonSetting1);
 
-        //TODO: FAIRE OPEN SETTINGS NIGHTMODE
-
-        mLightToggle.setOnClickListener(new View.OnClickListener() {
+        mNMToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (LIGHT_STATE == LIGHTS_OFF){
-                    LIGHT_STATE = LIGHTS_ON;
-                    mLightToggle.setImageResource(R.drawable.nice_lightbulb_on);
+                if (NM_STATE == NM_OFF){
+                    NM_STATE = NM_ON;
+                    mNMToggle.setImageResource(R.drawable.icone_moon);
 
                     Document filterDoc = new Document().append("username", "prototype");
-                    Document updateDoc = new Document().append("$set", new Document().append("light", 1));
+                    Document updateDoc = new Document().append("$set", new Document().append("nightmode", 1));
                     MainActivity.Collection.updateOne(filterDoc, updateDoc);
 
                 }else{
-                    LIGHT_STATE = LIGHTS_OFF;
-                    mLightToggle.setImageResource(R.drawable.nice_lightbulb_off);
+                    NM_STATE = NM_OFF;
+                    mNMToggle.setImageResource(R.drawable.icone_sun);
 
                     Document filterDoc = new Document().append("username", "prototype");
-                    Document updateDoc = new Document().append("$set", new Document().append("light", 0));
+                    Document updateDoc = new Document().append("$set", new Document().append("nightmode",0));
                     MainActivity.Collection.updateOne(filterDoc, updateDoc);
                 }
             }
@@ -266,7 +326,7 @@ public class PotActivity extends AppCompatActivity {
 
         GlideApp.with(this).load(urLogo).override(150,150).into(mSignIn);
         GlideApp.with(this).load(urlPot).override(3000,1000).into(mDownPot);
-        GlideApp.with(this).load(urlThermo).override(300,300).into(mViewTemperature);
+        GlideApp.with(this).load(urlThermo).override(300,300).into(mDashboard);
         GlideApp.with(this).load(urlPlant).into(mPlantView);
         GlideApp.with(this).load(urlrockyFontain).into(mFontain);
 

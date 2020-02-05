@@ -11,4 +11,5 @@
     <string name="weather_popup_title">Weather Forecast</string>
     <string name="settings">Settings</string>
     <string name="nightmode">Nightmode</string>
+    <string name="dashboard">Dashboard</string>
 </resources>

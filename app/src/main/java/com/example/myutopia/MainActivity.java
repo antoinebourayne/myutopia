@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     //Statics
     public static RemoteMongoClient mongoClient;
     public static RemoteMongoCollection Collection;
+    public static RemoteMongoCollection sensors;
     public static StitchAppClient stitchAppClient;
     public static int loggedIn = 0; // 0 : not logged in  1 : logged in
     public static User User;
