@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -44,9 +45,12 @@ public class PotActivity extends AppCompatActivity {
     private final static int NM_OFF = 0;
     private final static int NM_ON  = 1;
 
-    private static int LIGHT_STATE;
+    private final static int WATER_OFF = 0;
+    private final static int WATER_ON  = 1;
 
+    private static int LIGHT_STATE;
     private static int NM_STATE;
+    private static int WATER_STATE;
 
     private ImageView      mSignIn;
     private ImageView      mLights;
@@ -65,6 +69,9 @@ public class PotActivity extends AppCompatActivity {
 
     private Block<Document> printBlock;
 
+    public static String enlightment;
+
+
 
 
     @Override
@@ -76,6 +83,7 @@ public class PotActivity extends AppCompatActivity {
         updateView();
         LIGHT_STATE = LIGHTS_OFF;
         NM_STATE = NM_OFF;
+        WATER_STATE = WATER_OFF;
     }
 
     public void setViews()
@@ -144,13 +152,35 @@ public class PotActivity extends AppCompatActivity {
 
     public void toggleWater(ImageView v)
     {
-        ImageView img = (ImageView)findViewById(R.id.waterTap);
-        Animation outFade = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fade_out);
-        img.startAnimation(outFade);
+        ImageView mWaterToggle = (ImageView) findViewById(R.id.fontain);
 
-        Document filterDoc = new Document().append("username", "prototype");
-        Document updateDoc = new Document().append("$set", new Document().append("arrosage", 1));
-        MainActivity.Collection.updateOne(filterDoc, updateDoc);
+        mWaterToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (WATER_STATE == WATER_OFF){
+                    WATER_STATE = WATER_ON;
+
+                    ImageView img = (ImageView)findViewById(R.id.waterTap);
+                    Animation outFade = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fade_out);
+                    img.startAnimation(outFade);
+
+                    Document filterDoc = new Document().append("username", "prototype");
+                    Document updateDoc = new Document().append("$set", new Document().append("arrosage", 1));
+                    MainActivity.Collection.updateOne(filterDoc, updateDoc);
+
+                }else{
+                    WATER_STATE = WATER_OFF;
+
+                    ImageView img = (ImageView)findViewById(R.id.waterTap);
+                    Animation outFade = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fade_in);
+                    img.startAnimation(outFade);
+
+                    Document filterDoc = new Document().append("username", "prototype");
+                    Document updateDoc = new Document().append("$set", new Document().append("arrosage", 0));
+                    MainActivity.Collection.updateOne(filterDoc, updateDoc);
+                }
+            }
+        });
     }
 
     public void openDashboard(View v)
@@ -175,22 +205,24 @@ public class PotActivity extends AppCompatActivity {
         TextView mSensorValue2     = (TextView) popupView.findViewById(R.id.valueSensor2);
         TextView mSensorValue3     = (TextView) popupView.findViewById(R.id.valueSensor3);
 
-        mSensorName1.setText("Temperature");
-        mSensorName2.setText("Moisture");
-        mSensorName3.setText("enlightenment");
+        mSensorName1.setText("Température :");
+        mSensorName2.setText("Humidité :");
+        mSensorName3.setText("Luminosité :");
 
         printBlock = document -> { String sensorValue = document.toString();
-            Log.i(TAG, "CACA : "+sensorValue);
-            String a = document.toJson();}
+        enlightment = sensorValue.substring(sensorValue.lastIndexOf("enlightment=") + 12);
+        enlightment = enlightment.replace("}}","");
+            Log.i(TAG, "enlightment : "+enlightment);
+                        }
             ;
 
-        MainActivity.Collection.find(eq("username", "prototype")).forEach(printBlock);
-        MainActivity.Collection.find(eq("id_rpi", "prototype")).forEach(printBlock);
+        MainActivity.Collection.find(eq("id_rpi", "prototype")).limit(1).forEach(printBlock);
+
+        mSensorValue1.setText("21");
+        mSensorValue2.setText("73");
+        mSensorValue3.setText(enlightment);
 
 
-        //TODO: juste en dessous choper les valeurs
-        String example = "/abc/def/ghfj.doc";
-        System.out.println(example.substring(example.lastIndexOf("/") + 1));
 
         // dismiss the popup window when touched
         popupView.setOnTouchListener(new View.OnTouchListener() {
